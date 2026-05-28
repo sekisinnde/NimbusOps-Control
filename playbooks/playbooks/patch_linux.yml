@@ -1,0 +1,16 @@
+---
+- name: Patch Linux Servers
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Update packages
+      package:
+        name: "*"
+        state: latest
+
+    - name: Reboot if needed
+      reboot:
+        msg: "Reboot triggered by NimbusOps patching"
+        connect_timeout: 5
+        reboot_timeout: 600
