@@ -1,0 +1,24 @@
+---
+- name: System Health Check
+  hosts: all
+  gather_facts: yes
+
+  tasks:
+    - name: Check disk usage
+      command: df -h /
+      register: disk
+
+    - name: Check memory usage
+      command: free -m
+      register: memory
+
+    - name: Check CPU load
+      command: uptime
+      register: cpu
+
+    - name: Print summary
+      debug:
+        msg:
+          - "Disk: {{ disk.stdout }}"
+          - "Memory: {{ memory.stdout }}"
+          - "CPU Load: {{ cpu.stdout }}"
