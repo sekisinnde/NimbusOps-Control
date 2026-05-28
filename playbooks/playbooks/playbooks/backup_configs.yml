@@ -1,0 +1,16 @@
+---
+- name: Backup Configurations
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Create backup directory
+      file:
+        path: /var/backups/nimbusops
+        state: directory
+
+    - name: Backup /etc
+      archive:
+        path: /etc
+        dest: "/var/backups/nimbusops/etc-{{ inventory_hostname }}.tar.gz"
+
