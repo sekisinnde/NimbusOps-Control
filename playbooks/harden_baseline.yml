@@ -1,0 +1,24 @@
+---
+- name: Apply Security Baseline
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Ensure firewall is enabled
+      service:
+        name: ufw
+        state: started
+        enabled: yes
+
+    - name: Disable root SSH login
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^PermitRootLogin'
+        line: 'PermitRootLogin no'
+      notify: restart ssh
+
+  handlers:
+    - name: restart ssh
+      service:
+        name: ssh
+        state: restarted
