@@ -1,25 +1,31 @@
 ---
-- name: System Health Check
+- name: ClientA Health Check
   hosts: all
   gather_facts: yes
 
   tasks:
     - name: Check disk usage
-      command: df -h /
-      register: disk
+      command: df -h
+      register: disk_output
+
+    - name: Show disk usage
+      debug:
+        var: disk_output.stdout
 
     - name: Check memory usage
       command: free -m
-      register: memory
+      register: mem_output
 
-    - name: Check CPU load
-      command: uptime
-      register: cpu
-
-    - name: Print summary
+    - name: Show memory usage
       debug:
-        msg:
-          - "Disk: {{ disk.stdout }}"
-          - "Memory: {{ memory.stdout }}"
-          - "CPU Load: {{ cpu.stdout }}"
+        var: mem_output.stdout
+
+    - name: Check system uptime
+      command: uptime
+      register: uptime_output
+
+    - name: Show uptime
+      debug:
+        var: uptime_output.stdout
+
 
