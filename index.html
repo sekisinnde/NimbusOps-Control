@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NimbusOps Control Tower</title>
+
+    <style>
+        body {
+            background: #0d1117;
+            color: #e6edf3;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        .card {
+            background: #161b22;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #238636;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #2ea043;
+        }
+
+        #task-output {
+            background: #111;
+            color: #eee;
+            padding: 15px;
+            border-radius: 6px;
+            white-space: pre-wrap;
+            min-height: 150px;
+            border: 2px solid #30363d;
+            transition: 0.3s;
+        }
+
+        #logs-panel {
+            background: #161b22;
+            color: #eee;
+            padding: 15px;
+            border-radius: 6px;
+            white-space: pre-wrap;
+            min-height: 120px;
+            border: 1px solid #30363d;
+            margin-top: 20px;
+        }
+
+        #ai-response {
+            background: #161b22;
+            color: #eee;
+            padding: 15px;
+            border-radius: 6px;
+            white-space: pre-wrap;
+            min-height: 80px;
+            border: 1px solid #30363d;
+            margin-top: 10px;
+        }
+
+        /* Horizontal layout */
+        .task-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .task-column {
+            flex: 1;
+        }
+
+        /* Center photo */
+        .center-photo {
+            width: 240px;
+            height: 240px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 2px solid #30363d;
+            margin-top: 20px;
+        }
+
+        /* Responsive for small screens */
+        @media (max-width: 900px) {
+            .task-row {
+                flex-direction: column;
+                align-items: center;
+            }
+            .task-column {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>NimbusOps Control Tower</h1>
+
+    <!-- Horizontal Task Row -->
+    <div class="task-row">
+
+        <!-- Left Column -->
+        <div class="task-column">
+            <div class="card">
+                <h2>Health Check</h2>
+                <p>Runs system diagnostics: disk, memory, uptime.</p>
+                <button onclick="runHealthCheck()">Run Health Check</button>
+            </div>
+
+            <div class="card">
+                <h2>Backup</h2>
+                <p>Creates a full system backup.</p>
+                <button onclick="runBackup()">Run Backup</button>
+            </div>
+        </div>
+
+        <!-- Center Photo -->
+        <div class="task-column" style="text-align:center;">
+            <img src="webMePhoto.png" class="center-photo">
+        </div>
+
+        <!-- Right Column -->
+        <div class="task-column">
+            <div class="card">
+                <h2>Patch & Reboot</h2>
+                <p>Applies updates and reboots the system safely.</p>
+                <button onclick="runPatch()">Run Patch & Reboot</button>
+            </div>
+
+            <div class="card">
+                <h2>Security Scan</h2>
+                <p>Performs vulnerability and configuration checks.</p>
+                <button onclick="runSecurity()">Run Security Scan</button>
+            </div>
+        </div>
+
+    </div>
+
+    <h2>Task Output</h2>
+    <pre id="task-output">Waiting for task output...</pre>
+
+    <h2>Logs Panel</h2>
+    <pre id="logs-panel">Logs will appear here...</pre>
+
+    <h2>NimbusAI Assistant</h2>
+    <textarea id="ai-question" rows="3"
+              style="width:100%;border-radius:6px;padding:8px;background:#0d1117;color:#e6edf3;border:1px solid #30363d;"
+              placeholder="Ask NimbusAI about results, errors, or next steps..."></textarea>
+    <br><br>
+    <button onclick="askAI()">Ask NimbusAI</button>
+
+    <pre id="ai-response">AI responses will appear here...</pre>
+
+    <script src="app.js"></script>
+
+</body>
+</html>
+
+

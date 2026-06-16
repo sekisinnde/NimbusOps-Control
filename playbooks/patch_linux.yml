@@ -1,4 +1,5 @@
 ---
+<<<<<<< HEAD
 - name: Patch Linux Servers
   hosts: all
   become: yes
@@ -14,3 +15,32 @@
         msg: "Reboot triggered by NimbusOps patching"
         connect_timeout: 5
         reboot_timeout: 600
+=======
+- name: Patch and Reboot System
+  hosts: localhost
+  gather_facts: yes
+  become: yes
+
+  tasks:
+    - name: Update package lists
+      command: apt-get update -y
+      register: update_out
+
+    - name: Upgrade packages
+      command: apt-get upgrade -y
+      register: upgrade_out
+
+    - name: Display patch results
+      debug:
+        msg: |
+          === UPDATE OUTPUT ===
+          {{ update_out.stdout }}
+
+          === UPGRADE OUTPUT ===
+          {{ upgrade_out.stdout }}
+
+    - name: Simulate reboot
+      debug:
+        msg: "Reboot simulated — no actual reboot performed."
+
+>>>>>>> d9628c2 (Deploying NimbusOps backend and frontend)
