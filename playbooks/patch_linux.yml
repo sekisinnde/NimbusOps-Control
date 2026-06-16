@@ -1,46 +1,33 @@
 ---
-<<<<<<< HEAD
-- name: Patch Linux Servers
+- name: Patch Linux Systems
   hosts: all
   become: yes
+  gather_facts: yes
 
   tasks:
-    - name: Update packages
-      package:
-        name: "*"
-        state: latest
+    - name: Update apt package index
+      apt:
+        update_cache: yes
+      ignore_errors: yes
 
-    - name: Reboot if needed
+    - name: Upgrade all packages
+      apt:
+        upgrade: dist
+      register: upgrade_output
+      ignore_errors: yes
+
+    - name: Show upgrade results
+      debug:
+        var: upgrade_output.stdout_lines
+      ignore_errors: yes
+
+    - name: Reboot system if required
       reboot:
-        msg: "Reboot triggered by NimbusOps patching"
+        msg: "Reboot initiated by Ansible after patching"
         connect_timeout: 5
         reboot_timeout: 600
-=======
-- name: Patch and Reboot System
-  hosts: localhost
-  gather_facts: yes
-  become: yes
+        pre_reboot_delay: 0
+        post_reboot_delay: 30
+      when: upgrade_output is changed
+      ignore_errors: yes
 
-  tasks:
-    - name: Update package lists
-      command: apt-get update -y
-      register: update_out
-
-    - name: Upgrade packages
-      command: apt-get upgrade -y
-      register: upgrade_out
-
-    - name: Display patch results
-      debug:
-        msg: |
-          === UPDATE OUTPUT ===
-          {{ update_out.stdout }}
-
-          === UPGRADE OUTPUT ===
-          {{ upgrade_out.stdout }}
-
-    - name: Simulate reboot
-      debug:
-        msg: "Reboot simulated — no actual reboot performed."
-
->>>>>>> d9628c2 (Deploying NimbusOps backend and frontend)

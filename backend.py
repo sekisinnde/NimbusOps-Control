@@ -74,7 +74,6 @@ def ai_ask():
     stderr = LAST_TASK_OUTPUT["stderr"]
     task = LAST_TASK_OUTPUT["task"]
 
-    # 1. Summarization
     if "summarize" in question or "summary" in question:
         answer = (
             f"Here is a summary of the last task ({task}):\n\n"
@@ -84,7 +83,6 @@ def ai_ask():
         )
         return jsonify({"answer": answer})
 
-    # 2. Troubleshooting
     if "why" in question or "error" in question or "fail" in question:
         if "No errors reported" in stderr:
             answer = (
@@ -99,7 +97,6 @@ def ai_ask():
             )
         return jsonify({"answer": answer})
 
-    # 3. Next-step suggestions
     if "next" in question or "what should i do" in question:
         if "health" in task:
             answer = "Next step: run a security scan to validate system hardening."
@@ -113,7 +110,6 @@ def ai_ask():
             answer = "You can run any task next — health, security, patch, or backup."
         return jsonify({"answer": answer})
 
-    # Default fallback
     answer = (
         "NimbusAI can help with:\n"
         "- Summaries (e.g., 'Summarize the last task')\n"
@@ -125,6 +121,7 @@ def ai_ask():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
 
 

@@ -1,62 +1,62 @@
+
 ---
-<<<<<<< HEAD
-- name: Apply Security Baseline
+- name: Security Hardening Baseline
   hosts: all
   become: yes
+  gather_facts: yes
 
   tasks:
-    - name: Ensure firewall is enabled
-      service:
+    - name: Ensure UFW is installed
+      apt:
         name: ufw
-        state: started
-        enabled: yes
+        state: present
+      ignore_errors: yes
+
+    - name: Enable UFW firewall
+      ufw:
+        state: enabled
+        policy: deny
+      ignore_errors: yes
+
+    - name: Allow SSH through firewall
+      ufw:
+        rule: allow
+        name: OpenSSH
+      ignore_errors: yes
 
     - name: Disable root SSH login
       lineinfile:
         path: /etc/ssh/sshd_config
         regexp: '^PermitRootLogin'
         line: 'PermitRootLogin no'
-      notify: restart ssh
+      notify: Restart SSH
+      ignore_errors: yes
+
+    - name: Disable password authentication
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^PasswordAuthentication'
+        line: 'PasswordAuthentication no'
+      notify: Restart SSH
+      ignore_errors: yes
+
+    - name: Ensure fail2ban is installed
+      apt:
+        name: fail2ban
+        state: present
+      ignore_errors: yes
+
+    - name: Start and enable fail2ban
+      service:
+        name: fail2ban
+        state: started
+        enabled: yes
+      ignore_errors: yes
 
   handlers:
-    - name: restart ssh
+    - name: Restart SSH
       service:
         name: ssh
         state: restarted
-=======
-- name: Security Baseline Scan
-  hosts: localhost
-  gather_facts: yes
-  become: yes
+      ignore_errors: yes
 
-  tasks:
-    - name: Check world-writable files
-      shell: find / -type f -perm -0002 2>/dev/null | head -n 20
-      register: ww_files
-
-    - name: Check running services
-      command: systemctl list-units --type=service --state=running
-      register: services
-
-    - name: Check SSH configuration (safe mode)
-      shell: |
-        if [ -f /etc/ssh/sshd_config ]; then
-          cat /etc/ssh/sshd_config
-        else
-          echo "SSH server not installed on this system."
-        fi
-      register: ssh_config
-
-    - name: Display security scan results
-      debug:
-        msg: |
-          === WORLD WRITABLE FILES ===
-          {{ ww_files.stdout }}
-
-          === RUNNING SERVICES ===
-          {{ services.stdout }}
-
-          === SSH CONFIGURATION ===
-          {{ ssh_config.stdout }}
-
->>>>>>> d9628c2 (Deploying NimbusOps backend and frontend)

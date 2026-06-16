@@ -1,52 +1,56 @@
+
 ---
-<<<<<<< HEAD
-- name: Backup Configurations
+- name: Backup Critical System Configurations
   hosts: all
   become: yes
-
-  tasks:
-    - name: Create backup directory
-      file:
-        path: /var/backups/nimbusops
-        state: directory
-
-    - name: Backup /etc
-      archive:
-        path: /etc
-        dest: "/var/backups/nimbusops/etc-{{ inventory_hostname }}.tar.gz"
-=======
-- name: Backup System Configuration Files
-  hosts: localhost
   gather_facts: yes
-  become: yes
 
   vars:
-    backup_dir: "/tmp/nimbusops_backup"
+    backup_dir: /var/backups/configs
 
   tasks:
-    - name: Create backup directory
+    - name: Ensure backup directory exists
       file:
         path: "{{ backup_dir }}"
         state: directory
         mode: '0755'
+      ignore_errors: yes
 
-    - name: Backup /etc directory
-      command: tar -czf {{ backup_dir }}/etc_backup.tar.gz /etc
-      register: etc_backup
+    - name: Backup SSH configuration
+      copy:
+        src: /etc/ssh/sshd_config
+        dest: "{{ backup_dir }}/sshd_config.backup"
+        remote_src: yes
+      ignore_errors: yes
 
-    - name: Backup /home directory
-      command: tar -czf {{ backup_dir }}/home_backup.tar.gz /home
-      register: home_backup
+    - name: Backup hosts file
+      copy:
+        src: /etc/hosts
+        dest: "{{ backup_dir }}/hosts.backup"
+        remote_src: yes
+      ignore_errors: yes
+
+    - name: Backup fstab
+      copy:
+        src: /etc/fstab
+        dest: "{{ backup_dir }}/fstab.backup"
+        remote_src: yes
+      ignore_errors: yes
+
+    - name: Backup network interfaces
+      copy:
+        src: /etc/network/interfaces
+        dest: "{{ backup_dir }}/interfaces.backup"
+        remote_src: yes
+      ignore_errors: yes
+
+    - name: Show backup directory contents
+      command: ls -l "{{ backup_dir }}"
+      register: backup_list
+      ignore_errors: yes
 
     - name: Display backup results
       debug:
-        msg: |
-          === BACKUP DIRECTORY ===
-          {{ backup_dir }}
+        var: backup_list.stdout_lines
+      ignore_errors: yes
 
-          === /etc BACKUP ===
-          {{ etc_backup.stdout }}
-
-          === /home BACKUP ===
-          {{ home_backup.stdout }}
->>>>>>> d9628c2 (Deploying NimbusOps backend and frontend)
