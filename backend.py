@@ -19,7 +19,7 @@ def run_playbook(playbook):
     playbook_path = os.path.join(PLAYBOOK_DIR, playbook)
 
     try:
-        # ⭐ IMPORTANT: use remote inventory, NOT localhost
+        # ⭐ IMPORTANT: Use remote.ini (NOT inventory.ini)
         inventory_path = os.path.join(BASE_DIR, "remote.ini")
 
         result = subprocess.run(
