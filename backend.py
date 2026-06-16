@@ -19,8 +19,11 @@ def run_playbook(playbook):
     playbook_path = os.path.join(PLAYBOOK_DIR, playbook)
 
     try:
+        # ⭐ IMPORTANT: use remote inventory, NOT localhost
+        inventory_path = os.path.join(BASE_DIR, "remote.ini")
+
         result = subprocess.run(
-            ["ansible-playbook", "-i", "inventory.ini", playbook_path],
+            ["ansible-playbook", "-i", inventory_path, playbook_path],
             capture_output=True,
             text=True
         )
@@ -136,7 +139,6 @@ def ai_ask():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
-
 
 
 
