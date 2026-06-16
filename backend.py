@@ -46,6 +46,10 @@ def run_playbook(playbook):
             "stderr": f"Backend exception: {str(e)}"
         }
 
+# -------------------------------
+# API ROUTES
+# -------------------------------
+
 @app.get("/api/health-check/run")
 def run_health_check():
     return jsonify(run_playbook("health_check.yml"))
@@ -54,18 +58,21 @@ def run_health_check():
 def run_patch():
     return jsonify(run_playbook("patch_linux.yml"))
 
-@app.get("/api/security/run")
-def run_security():
-    return jsonify(run_playbook("harden_baseline.yml"))
-
 @app.get("/api/backup/run")
 def run_backup():
     return jsonify(run_playbook("backup_configs.yml"))
 
-@app.post("/api/ai/ask")
+@app.get("/api/harden/run")
+def run_harden():
+    return jsonify(run_playbook("harden_baseline.yml"))
+
+# -------------------------------
+# NimbusAI Assistant
+# -------------------------------
+
+@app.get("/api/ai/ask")
 def ai_ask():
-    data = request.get_json(silent=True) or {}
-    question = (data.get("question") or "").strip().lower()
+    question = request.args.get("question", "").strip().lower()
 
     if not question:
         return jsonify({"answer": "Please type a question for NimbusAI."})
@@ -74,6 +81,7 @@ def ai_ask():
     stderr = LAST_TASK_OUTPUT["stderr"]
     task = LAST_TASK_OUTPUT["task"]
 
+    # Summaries
     if "summarize" in question or "summary" in question:
         answer = (
             f"Here is a summary of the last task ({task}):\n\n"
@@ -83,6 +91,7 @@ def ai_ask():
         )
         return jsonify({"answer": answer})
 
+    # Troubleshooting
     if "why" in question or "error" in question or "fail" in question:
         if "No errors reported" in stderr:
             answer = (
@@ -97,6 +106,7 @@ def ai_ask():
             )
         return jsonify({"answer": answer})
 
+    # Next-step suggestions
     if "next" in question or "what should i do" in question:
         if "health" in task:
             answer = "Next step: run a security scan to validate system hardening."
@@ -110,6 +120,7 @@ def ai_ask():
             answer = "You can run any task next — health, security, patch, or backup."
         return jsonify({"answer": answer})
 
+    # Default fallback
     answer = (
         "NimbusAI can help with:\n"
         "- Summaries (e.g., 'Summarize the last task')\n"
@@ -119,9 +130,12 @@ def ai_ask():
     )
     return jsonify({"answer": answer})
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+# -------------------------------
+# Run Flask
+# -------------------------------
 
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
 
 
 
