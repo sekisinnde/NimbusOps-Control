@@ -64,6 +64,25 @@
             text-align: left;
             white-space: pre-wrap;
         }
+
+        /* NimbusAI Assistant Styling */
+        .ai-box {
+            margin-top: 30px;
+            padding: 20px;
+            background: #eef6ff;
+            border-radius: 10px;
+            text-align: left;
+        }
+
+        .ai-input {
+            width: 100%;
+            height: 80px;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
     </style>
 </head>
 
@@ -81,6 +100,14 @@
             alt="NimbusOps QR Code"
             class="qr-code"
         />
+
+        <!-- NimbusAI Assistant -->
+        <div class="ai-box">
+            <h3>NimbusAI Assistant</h3>
+            <textarea id="aiInput" placeholder="Ask NimbusAI anything..." class="ai-input"></textarea>
+            <button class="btn" onclick="askAI()">Ask NimbusAI</button>
+            <div id="aiOutput" class="output-box">AI ready...</div>
+        </div>
 
         <h2>Operations Dashboard</h2>
 
@@ -123,9 +150,24 @@
         function runHarden() {
             callAPI("/api/harden/run");
         }
+
+        /* NimbusAI Chatbot Function */
+        async function askAI() {
+            const question = document.getElementById("aiInput").value;
+            const output = document.getElementById("aiOutput");
+
+            output.textContent = "Thinking...";
+
+            try {
+                const response = await fetch(`${API_BASE}/api/ai/ask?question=${encodeURIComponent(question)}`);
+                const data = await response.json();
+                output.textContent = data.answer || JSON.stringify(data, null, 2);
+            } catch (err) {
+                output.textContent = "Error: " + err;
+            }
+        }
     </script>
 
 </body>
 </html>
-
 
