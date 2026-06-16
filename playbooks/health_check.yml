@@ -1,7 +1,7 @@
----
 - name: ClientA Health Check
-  hosts: all
+  hosts: targets
   gather_facts: yes
+  become: yes
 
   tasks:
     - name: Check disk usage
@@ -13,7 +13,7 @@
         var: disk_output.stdout
 
     - name: Check memory usage
-      command: free -m
+      command: free -h
       register: mem_output
 
     - name: Show memory usage

@@ -1,56 +1,30 @@
-
----
 - name: Backup Critical System Configurations
-  hosts: all
+  hosts: targets
   become: yes
-  gather_facts: yes
+  gather_facts: no
 
   vars:
-    backup_dir: /var/backups/configs
+    backup_dir: /tmp/nimbusops_backups
 
   tasks:
-    - name: Ensure backup directory exists
+    - name: Create backup directory
       file:
         path: "{{ backup_dir }}"
         state: directory
         mode: '0755'
-      ignore_errors: yes
 
     - name: Backup SSH configuration
       copy:
         src: /etc/ssh/sshd_config
         dest: "{{ backup_dir }}/sshd_config.backup"
-        remote_src: yes
-      ignore_errors: yes
 
     - name: Backup hosts file
       copy:
         src: /etc/hosts
         dest: "{{ backup_dir }}/hosts.backup"
-        remote_src: yes
-      ignore_errors: yes
 
     - name: Backup fstab
       copy:
         src: /etc/fstab
         dest: "{{ backup_dir }}/fstab.backup"
-        remote_src: yes
-      ignore_errors: yes
-
-    - name: Backup network interfaces
-      copy:
-        src: /etc/network/interfaces
-        dest: "{{ backup_dir }}/interfaces.backup"
-        remote_src: yes
-      ignore_errors: yes
-
-    - name: Show backup directory contents
-      command: ls -l "{{ backup_dir }}"
-      register: backup_list
-      ignore_errors: yes
-
-    - name: Display backup results
-      debug:
-        var: backup_list.stdout_lines
-      ignore_errors: yes
 

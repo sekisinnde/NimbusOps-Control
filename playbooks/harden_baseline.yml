@@ -1,7 +1,5 @@
-
----
-- name: Security Hardening Baseline
-  hosts: all
+- name: Apply Security Hardening Baseline
+  hosts: targets
   become: yes
   gather_facts: yes
 
@@ -10,53 +8,25 @@
       apt:
         name: ufw
         state: present
-      ignore_errors: yes
 
-    - name: Enable UFW firewall
+    - name: Enable UFW
       ufw:
         state: enabled
-        policy: deny
-      ignore_errors: yes
 
     - name: Allow SSH through firewall
       ufw:
         rule: allow
-        name: OpenSSH
-      ignore_errors: yes
+        port: 22
+        proto: tcp
 
     - name: Disable root SSH login
       lineinfile:
         path: /etc/ssh/sshd_config
         regexp: '^PermitRootLogin'
         line: 'PermitRootLogin no'
-      notify: Restart SSH
-      ignore_errors: yes
 
-    - name: Disable password authentication
-      lineinfile:
-        path: /etc/ssh/sshd_config
-        regexp: '^PasswordAuthentication'
-        line: 'PasswordAuthentication no'
-      notify: Restart SSH
-      ignore_errors: yes
-
-    - name: Ensure fail2ban is installed
-      apt:
-        name: fail2ban
-        state: present
-      ignore_errors: yes
-
-    - name: Start and enable fail2ban
-      service:
-        name: fail2ban
-        state: started
-        enabled: yes
-      ignore_errors: yes
-
-  handlers:
-    - name: Restart SSH
+    - name: Restart SSH service
       service:
         name: ssh
         state: restarted
-      ignore_errors: yes
 

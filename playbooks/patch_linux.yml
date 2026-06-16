@@ -1,6 +1,5 @@
----
-- name: Patch Linux Systems
-  hosts: all
+- name: Patch Linux System
+  hosts: targets
   become: yes
   gather_facts: yes
 
@@ -8,26 +7,10 @@
     - name: Update apt package index
       apt:
         update_cache: yes
-      ignore_errors: yes
 
     - name: Upgrade all packages
       apt:
         upgrade: dist
-      register: upgrade_output
-      ignore_errors: yes
-
-    - name: Show upgrade results
-      debug:
-        var: upgrade_output.stdout_lines
-      ignore_errors: yes
-
-    - name: Reboot system if required
-      reboot:
-        msg: "Reboot initiated by Ansible after patching"
-        connect_timeout: 5
-        reboot_timeout: 600
-        pre_reboot_delay: 0
-        post_reboot_delay: 30
-      when: upgrade_output is changed
-      ignore_errors: yes
+        autoremove: yes
+        autoclean: yes
 
