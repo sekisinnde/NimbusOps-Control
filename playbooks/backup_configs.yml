@@ -10,8 +10,8 @@
     backup_dir: "{{ backup_base_dir }}/{{ backup_timestamp }}"
 
   tasks:
-    - name: Create backup base directory
-    # Ensures /opt/backups exists
+
+    - name: Ensure base backup directory exists
       file:
         path: "{{ backup_base_dir }}"
         state: directory
@@ -26,6 +26,16 @@
         owner: root
         group: root
         mode: '0755'
+
+    - name: Re-check backup directory exists (Render fix)
+      stat:
+        path: "{{ backup_dir }}"
+      register: backup_dir_check
+
+    - name: Abort if backup directory does not exist
+      fail:
+        msg: "Backup directory {{ backup_dir }} does not exist"
+      when: not backup_dir_check.stat.exists
 
     - name: Backup SSH configuration
       copy:
