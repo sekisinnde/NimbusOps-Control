@@ -1,30 +1,63 @@
+---
 - name: Backup Critical System Configurations
   hosts: targets
   become: yes
   gather_facts: no
 
   vars:
-    backup_dir: /tmp/nimbusops_backups
+    backup_base_dir: /opt/backups
+    backup_timestamp: "{{ lookup('pipe', 'date +%Y%m%d-%H%M%S') }}"
+    backup_dir: "{{ backup_base_dir }}/{{ backup_timestamp }}"
 
   tasks:
-    - name: Create backup directory
+    - name: Create backup base directory
+    # Ensures /opt/backups exists
+      file:
+        path: "{{ backup_base_dir }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Create timestamped backup directory
       file:
         path: "{{ backup_dir }}"
         state: directory
+        owner: root
+        group: root
         mode: '0755'
 
     - name: Backup SSH configuration
       copy:
         src: /etc/ssh/sshd_config
-        dest: "{{ backup_dir }}/sshd_config.backup"
+        dest: "{{ backup_dir }}/sshd_config"
+        remote_src: yes
 
-    - name: Backup hosts file
+    - name: Backup sudoers file
       copy:
-        src: /etc/hosts
-        dest: "{{ backup_dir }}/hosts.backup"
+        src: /etc/sudoers
+        dest: "{{ backup_dir }}/sudoers"
+        remote_src: yes
 
-    - name: Backup fstab
+    - name: Backup passwd file
       copy:
-        src: /etc/fstab
-        dest: "{{ backup_dir }}/fstab.backup"
+        src: /etc/passwd
+        dest: "{{ backup_dir }}/passwd"
+        remote_src: yes
+
+    - name: Backup group file
+      copy:
+        src: /etc/group
+        dest: "{{ backup_dir }}/group"
+        remote_src: yes
+
+    - name: Create compressed archive of backup directory
+      archive:
+        path: "{{ backup_dir }}"
+        dest: "{{ backup_base_dir }}/config-backup-{{ backup_timestamp }}.tar.gz"
+        format: gz
+
+    - name: Show backup location
+      debug:
+        msg: "Backup created at {{ backup_base_dir }}/config-backup-{{ backup_timestamp }}.tar.gz"
 
