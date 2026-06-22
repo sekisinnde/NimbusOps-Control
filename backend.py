@@ -19,8 +19,8 @@ def run_playbook(playbook):
     playbook_path = os.path.join(PLAYBOOK_DIR, playbook)
 
     try:
-        # ⭐ IMPORTANT: Use remote.ini (NOT inventory.ini)
-        inventory_path = os.path.join(BASE_DIR, "remote.ini")
+        # ⭐ FIXED: Always use inventory.ini (the correct working file)
+        inventory_path = os.path.join(BASE_DIR, "inventory.ini")
 
         result = subprocess.run(
             ["ansible-playbook", "-i", inventory_path, playbook_path],
