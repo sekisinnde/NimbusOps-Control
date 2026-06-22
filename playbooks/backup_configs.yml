@@ -11,7 +11,8 @@
 
   tasks:
 
-    - name: Ensure base backup directory exists
+    - name: Ensure base backup directory exists on remote
+      become: yes
       file:
         path: "{{ backup_base_dir }}"
         state: directory
@@ -19,7 +20,8 @@
         group: root
         mode: '0755'
 
-    - name: Create timestamped backup directory
+    - name: Create timestamped backup directory on remote
+      become: yes
       file:
         path: "{{ backup_dir }}"
         state: directory
@@ -27,7 +29,8 @@
         group: root
         mode: '0755'
 
-    - name: Re-check backup directory exists (Render fix)
+    - name: Verify backup directory exists
+      become: yes
       stat:
         path: "{{ backup_dir }}"
       register: backup_dir_check
@@ -38,30 +41,35 @@
       when: not backup_dir_check.stat.exists
 
     - name: Backup SSH configuration
+      become: yes
       copy:
         src: /etc/ssh/sshd_config
         dest: "{{ backup_dir }}/sshd_config"
         remote_src: yes
 
     - name: Backup sudoers file
+      become: yes
       copy:
         src: /etc/sudoers
         dest: "{{ backup_dir }}/sudoers"
         remote_src: yes
 
     - name: Backup passwd file
+      become: yes
       copy:
         src: /etc/passwd
         dest: "{{ backup_dir }}/passwd"
         remote_src: yes
 
     - name: Backup group file
+      become: yes
       copy:
         src: /etc/group
         dest: "{{ backup_dir }}/group"
         remote_src: yes
 
     - name: Create compressed archive of backup directory
+      become: yes
       archive:
         path: "{{ backup_dir }}"
         dest: "{{ backup_base_dir }}/config-backup-{{ backup_timestamp }}.tar.gz"
